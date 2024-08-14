@@ -40,7 +40,7 @@ export class AuthService {
     });
 
     // Lưu refresh_token lên Redis
-    await this.redisClient.set(`refresh_token_${user.id}`, refresh_token, 'EX', 120);
+    // await this.redisClient.set(`refresh_token_${user.id}`, refresh_token, 'EX', 120);
 
     return {
       access_token: access_token,
