@@ -6,11 +6,14 @@ import {
   HttpStatus,
   Post,
   Request,
-  UseGuards
+  UseGuards,
+  UsePipes,
+  ValidationPipe
 } from '@nestjs/common';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/auth.user.dto';
+import { LoginUserDto } from './dto/auth.login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -18,8 +21,9 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
-    return this.authService.signIn(signInDto.email, signInDto.password);
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  signIn(@Body() loginUserDto : LoginUserDto) {
+    return this.authService.signIn(loginUserDto.email, loginUserDto.password);
   }
 
   @HttpCode(HttpStatus.CREATED)

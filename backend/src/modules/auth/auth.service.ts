@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { UsersService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/auth.user.dto';
+import { LoginUserDto } from './dto/auth.login.dto';
 import * as bcrypt from 'bcrypt';
 import Redis from 'ioredis';  // Import mặc định
 
