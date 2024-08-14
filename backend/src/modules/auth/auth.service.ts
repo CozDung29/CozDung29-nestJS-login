@@ -1,30 +1,25 @@
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
-import { UsersService } from '../user/user.service';
+import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto } from './dto/auth.user.dto';
 import { LoginUserDto } from './dto/auth.login.dto';
-import * as bcrypt from 'bcrypt';
-import Redis from 'ioredis';  // Import mặc định
+import { RedisConfig } from '../config/config.redis';
+import * as bcrypt from 'bcrypt';  // Import mặc định
 
 @Injectable()
 export class AuthService {
-  private redisClient: Redis;
+  // private redisConfig : RedisConfig;
 
   constructor(
-    private usersService: UsersService,
+    private userService: UserService,
     private jwtService: JwtService
-  ) {
-    this.redisClient = new Redis({
-      host: 'localhost',
-      port: 6381,
-    });
-  }
+  ) {}
 
-  async signIn(
+  async logIn(
     email: string,
     password: string,
   ): Promise<{ access_token: string, refresh_token: string }> {
-    const user = await this.usersService.findOne(email);
+    const user = await this.userService.getUserByEmail(email);
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
@@ -48,17 +43,17 @@ export class AuthService {
     };
   }
 
-  async register(createUserDto: CreateUserDto): Promise<{ access_token: string }> {
-    const existingUser = await this.usersService.findOne(createUserDto.email);
-    if (existingUser) {
-      throw new ConflictException('Email already in use');
-    }
+  // async register(createUserDto: CreateUserDto): Promise<{ access_token: string }> {
+  //   const existingUser = await this.userService.findOne(createUserDto.email);
+  //   if (existingUser) {
+  //     throw new ConflictException('Email already in use');
+  //   }
 
-    const user = await this.usersService.createUser(createUserDto);
+  //   const user = await this.userService.createUser(createUserDto);
 
-    const payload = { sub: user.id, email: user.email };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
-  }
+  //   const payload = { sub: user.id, email: user.email };
+  //   return {
+  //     access_token: await this.jwtService.signAsync(payload),
+  //   };
+  // }
 }

@@ -1,7 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as dotenv from 'dotenv';
 
-dotenv.config(); 
+dotenv.config();
 
 export const databaseConfig = async (): Promise<TypeOrmModuleOptions> => ({
   type: 'mysql',
@@ -11,5 +11,4 @@ export const databaseConfig = async (): Promise<TypeOrmModuleOptions> => ({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   autoLoadEntities: true,
-  synchronize: true,
 });

@@ -23,14 +23,14 @@ export class AuthController {
   @Post('login')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   signIn(@Body() loginUserDto : LoginUserDto) {
-    return this.authService.signIn(loginUserDto.email, loginUserDto.password);
+    return this.authService.logIn(loginUserDto.email, loginUserDto.password);
   }
 
-  @HttpCode(HttpStatus.CREATED)
-  @Post('register')
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
-  }
+  // @HttpCode(HttpStatus.CREATED)
+  // @Post('register')
+  // register(@Body() createUserDto: CreateUserDto) {
+  //   return this.authService.register(createUserDto);
+  // }
 
   @UseGuards(AuthGuard)
   @Get('profile')

@@ -1,17 +1,15 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/user/user.module';
 
-import { databaseConfig } from './modules/config/config.database';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { sequelizeConfig } from './modules/config/config.sequelize';
 
 @Module({
   imports: [
-    TypeOrmModule.forRootAsync({
-      useFactory: databaseConfig,
-    }),
+    SequelizeModule.forRootAsync(sequelizeConfig),
     AuthModule,
     UsersModule,
-  ]
+  ],
 })
 export class AppModule {}
