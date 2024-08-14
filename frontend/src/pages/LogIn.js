@@ -9,9 +9,9 @@ const LogIn = () => {
     console.log('Received values of form: ', values);
     try {
       const response = await axios.post('/auth/login', values);
-      message.success(response.data.message); // Hiển thị thông báo thành công
+      message.success(response.data.message); 
     } catch (error) {
-      message.error('Registration failed, please try again.'); // Hiển thị thông báo lỗi
+      message.error('Registration failed, please try again.'); 
     }
   };
 

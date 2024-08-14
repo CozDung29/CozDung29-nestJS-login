@@ -1,10 +1,12 @@
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { JwtService } from '@nestjs/jwt';
+// import { JwtService } from '@nestjs/jwt';
+import { TokenService } from '../token/token.service';
 import { CreateUserDto } from './dto/auth.user.dto';
-import { LoginUserDto } from './dto/auth.login.dto';
-import { RedisConfig } from '../config/config.redis';
+// import { LoginUserDto } from './dto/auth.login.dto';
+// import { RedisConfig } from '../config/config.redis';
 import * as bcrypt from 'bcrypt';  // Import mặc định
+
 
 @Injectable()
 export class AuthService {
@@ -12,7 +14,7 @@ export class AuthService {
 
   constructor(
     private userService: UserService,
-    private jwtService: JwtService
+    private tokenService: TokenService
   ) {}
 
   async logIn(
@@ -29,10 +31,8 @@ export class AuthService {
     }
     const payload = { sub: user.id, email: user.email };
 
-    const access_token = await this.jwtService.signAsync(payload);
-    const refresh_token = await this.jwtService.signAsync(payload, {
-      expiresIn: '120s',
-    });
+    const access_token = await this.tokenService.renderToken(payload, 10);
+    const refresh_token = await this.tokenService.renderToken(payload, 50);
 
     // Lưu refresh_token lên Redis
     // await this.redisClient.set(`refresh_token_${user.id}`, refresh_token, 'EX', 120);
@@ -43,17 +43,17 @@ export class AuthService {
     };
   }
 
-  // async register(createUserDto: CreateUserDto): Promise<{ access_token: string }> {
-  //   const existingUser = await this.userService.findOne(createUserDto.email);
-  //   if (existingUser) {
-  //     throw new ConflictException('Email already in use');
-  //   }
+  async register(createUserDto: CreateUserDto): Promise<{ access_token: string }> {
+    const existingUser = await this.userService.getUserByEmail(createUserDto.email);
+    if (existingUser) {
+      throw new ConflictException('Email already in use');
+    }
 
-  //   const user = await this.userService.createUser(createUserDto);
+    const user = await this.userService.createUser(createUserDto);
 
-  //   const payload = { sub: user.id, email: user.email };
-  //   return {
-  //     access_token: await this.jwtService.signAsync(payload),
-  //   };
-  // }
+    const payload = { sub: user.id, email: user.email };
+    return {
+      access_token: await this.tokenService.renderToken(payload, 10),
+    };
+  }
 }

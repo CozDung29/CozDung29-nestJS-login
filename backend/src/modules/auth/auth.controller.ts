@@ -26,11 +26,11 @@ export class AuthController {
     return this.authService.logIn(loginUserDto.email, loginUserDto.password);
   }
 
-  // @HttpCode(HttpStatus.CREATED)
-  // @Post('register')
-  // register(@Body() createUserDto: CreateUserDto) {
-  //   return this.authService.register(createUserDto);
-  // }
+  @HttpCode(HttpStatus.CREATED)
+  @Post('register')
+  register(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
+  }
 
   @UseGuards(AuthGuard)
   @Get('profile')
