@@ -3,22 +3,22 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from './dto/auth.user.dto';
-import { RedisConfig } from '../config/config.redis';
+// import { RedisConfig } from '../config/config.redis';
 import * as bcrypt from 'bcrypt';
-import Redis from 'ioredis';
+// import Redis from 'ioredis';
 
 
 @Injectable()
 export class AuthService {
-  private readonly redisClient: Redis;
+  // private readonly redisClient: Redis;
 
   constructor(
     private userService: UserService,
     private tokenService: TokenService,
     private tokenRepository : TokenRepository,
-    redisConfig : RedisConfig
+    // redisConfig : RedisConfig
   ) {
-    this.redisClient = redisConfig.getClient();
+    // this.redisClient = redisConfig.getClient();
   }
 
   async logIn(
@@ -39,7 +39,7 @@ export class AuthService {
     const refresh_token = await this.tokenService.renderToken(payload, 100);
 
     // Lưu refresh_token lên Redis
-    await this.redisClient.set(`refresh_token_${user.id}`, refresh_token, 'EX', 120);
+    // await this.redisClient.set(`refresh_token_${user.id}`, refresh_token, 'EX', 120);
 
     const token = {
       userId : user.id,

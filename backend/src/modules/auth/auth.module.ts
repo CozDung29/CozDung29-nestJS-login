@@ -13,7 +13,7 @@ import { SmsModule } from '../sms/sms.module';
     TokenModule,
     SmsModule
   ],
-  providers: [AuthService, RedisConfig],
+  providers: [AuthService],
   controllers: [AuthController],
   exports: [AuthService],
 })
