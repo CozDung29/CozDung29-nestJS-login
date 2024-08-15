@@ -10,14 +10,16 @@ export class TokenService {
     ) {}
 
     async renderToken(user: any, expiredTime: number): Promise<string> {
+        const expirationTime = Math.floor(Date.now() / 1000) + expiredTime;
         return this.jwtService.signAsync(
             {
-                userID: user.id, 
+                userId: user.id, 
+                email: user.email,
                 role: user.role,
-                exp: expiredTime,
             },
             {
                 secret: process.env.JWT_SECRET,
+                expiresIn: expiredTime
             }
         );
     }

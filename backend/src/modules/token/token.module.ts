@@ -11,6 +11,6 @@ import { Token } from './token.model';  // Assuming you have a Token model
     SequelizeModule.forFeature([Token]),  
   ],
   providers: [TokenService, TokenRepository],
-  exports: [TokenService],
+  exports: [TokenService, TokenRepository],
 })
 export class TokenModule {}

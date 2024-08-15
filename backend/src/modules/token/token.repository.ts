@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-
 import { Token } from './token.model';
 
 @Injectable()
@@ -11,18 +10,27 @@ export class TokenRepository {
     ) {}
 
     async add(token) {
+        console.log(token);
         await Token.create({
             id: token.id,
-            userId: token.user_id,
-            accessToken: token.accessToken,
-            refreshToken: token.refresh
+            userId: token.userId,
+            accessToken: token.access_token,
+            refreshToken: token.refresh_token
         })
     }
 
-    async deleteById(id){
+    async deleteByUserId(userId){
         return await Token.destroy({
             where: {
-                id: id,
+                userId: userId,
+            }
+        })
+    }
+
+    async findByUserId(userId){
+        return await Token.findOne({
+            where: {
+                userId: userId
             }
         })
     }

@@ -41,16 +41,19 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
   @Post('logout')
-  logout(@Request() req) {
-    // Implement logic to handle logout if needed
+  async logout(@Request() req) {
+    const userId = req.body.id;
+    console.log(userId);
+    await this.authService.logOut(userId);
     return { message: 'Logged out successfully' };
   }
 
-  // @UseGuards(AuthGuard)
-  // @HttpCode(HttpStatus.OK)
-  // @Post('refresh')
-  // refresh(@Request() req) {
-  //   const user = req.user;
-  //   return this.authService.refreshToken(user);
-  // }
+  @UseGuards(AuthGuard)
+  @HttpCode(HttpStatus.OK)
+  @Post('refresh')
+  refresh(@Request() req) {
+    const userId = req.body.userId;
+    const refresh_token = req.body.refresh_token;
+    return this.authService.refreshAccessToken(userId, refresh_token);
+  }
 }

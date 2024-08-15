@@ -1,3 +1,4 @@
+import { TokenRepository } from './../token/token.repository';
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { UsersModule } from '../user/user.module';

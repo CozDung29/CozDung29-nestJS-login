@@ -18,16 +18,18 @@ import { Request } from 'express';
       const request = context.switchToHttp().getRequest();
       const token = this.extractTokenFromHeader(request);
       if (!token) {
-        throw new UnauthorizedException();
+          throw new UnauthorizedException('Token not found');
       }
       try {
-        const payload = await this.tokenService.verifyToken(token);
-        request['user'] = payload;
-      } catch {
-        throw new UnauthorizedException();
+          const payload = await this.tokenService.verifyToken(token);
+          request['user'] = payload;
+      } catch (error) {
+          console.error('Token verification failed:', error.message);
+          throw new UnauthorizedException(error.message);
       }
       return true;
-    }
+  }
+  
   
     private extractTokenFromHeader(request: Request): string | undefined {
       const [type, token] = request.headers.authorization?.split(' ') ?? [];

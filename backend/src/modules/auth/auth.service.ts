@@ -1,3 +1,4 @@
+import { TokenRepository } from './../token/token.repository';
 import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 // import { JwtService } from '@nestjs/jwt';
@@ -14,7 +15,8 @@ export class AuthService {
 
   constructor(
     private userService: UserService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private tokenRepository : TokenRepository
   ) {}
 
   async logIn(
@@ -29,13 +31,21 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException();
     }
-    const payload = { sub: user.id, email: user.email };
+    const payload = { id: user.id, email: user.email, role: user.role };
 
-    const access_token = await this.tokenService.renderToken(payload, 10);
-    const refresh_token = await this.tokenService.renderToken(payload, 50);
+    const access_token = await this.tokenService.renderToken(payload, 20);
+    const refresh_token = await this.tokenService.renderToken(payload, 100);
 
     // Lưu refresh_token lên Redis
     // await this.redisClient.set(`refresh_token_${user.id}`, refresh_token, 'EX', 120);
+
+    const token = {
+      userId : user.id,
+      access_token: access_token,
+      refresh_token: refresh_token
+    }
+
+    this.tokenRepository.add(token);
 
     return {
       access_token: access_token,
@@ -51,9 +61,32 @@ export class AuthService {
 
     const user = await this.userService.createUser(createUserDto);
 
-    const payload = { sub: user.id, email: user.email };
+    const payload = { id: user.id, email: user.email };
     return {
-      access_token: await this.tokenService.renderToken(payload, 10),
+      access_token: await this.tokenService.renderToken(payload, 50),
+    };
+  }
+
+  async logOut(userId: number): Promise<void> {
+    await this.tokenRepository.deleteByUserId(userId);
+  }
+
+  async refreshAccessToken(userId: number, refresh_token: string): Promise<{access_token: String }> {
+    const storedToken = await this.tokenRepository.findByUserId(userId);
+
+    console.log(storedToken);
+
+    console.log(storedToken.dataValues.refreshToken);
+
+    if (!storedToken || storedToken.dataValues.refreshToken != refresh_token) {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+
+    const payload = { sub: userId, refresh_token: storedToken.refreshToken };
+    const newAccessToken = await this.tokenService.renderToken(payload, 10);
+
+    return {
+      access_token: newAccessToken
     };
   }
 }
