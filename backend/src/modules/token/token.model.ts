@@ -23,11 +23,11 @@ export class Token extends Model<Token> {
   })
   refreshToken: string;
 
-  @Column({
-    type: 'VARCHAR(255)',
-    allowNull: false,
-  })
-  accessToken: string;
+  // @Column({
+  //   type: 'VARCHAR(255)',
+  //   allowNull: false,
+  // })
+  // accessToken: string;
 
   @BelongsTo(() => User)
   user: User;

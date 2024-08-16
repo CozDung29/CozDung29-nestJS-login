@@ -10,7 +10,6 @@ export class TokenService {
     ) {}
 
     async renderToken(user: any, expiredTime: number): Promise<string> {
-        const expirationTime = Math.floor(Date.now() / 1000) + expiredTime;
         return this.jwtService.signAsync(
             {
                 userId: user.id, 

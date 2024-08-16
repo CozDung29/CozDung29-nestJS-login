@@ -47,7 +47,7 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('logout')
   async logout(@Request() req) {
-    const userId = req.user?.id;
+    const userId = req.body.id;
     if (!userId) {
       throw new UnauthorizedException('User ID not found');
     }

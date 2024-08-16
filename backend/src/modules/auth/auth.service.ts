@@ -3,22 +3,21 @@ import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/co
 import { UserService } from '../user/user.service';
 import { TokenService } from '../token/token.service';
 import { CreateUserDto } from './dto/auth.user.dto';
-// import { RedisConfig } from '../config/config.redis';
 import * as bcrypt from 'bcrypt';
-// import Redis from 'ioredis';
-
+import Redis from 'ioredis';
+import { RedisConfig } from '../config/config.redis';
 
 @Injectable()
 export class AuthService {
-  // private readonly redisClient: Redis;
+  private readonly redisClient: Redis;
 
   constructor(
     private userService: UserService,
     private tokenService: TokenService,
     private tokenRepository : TokenRepository,
-    // redisConfig : RedisConfig
+    redisConfig : RedisConfig
   ) {
-    // this.redisClient = redisConfig.getClient();
+    this.redisClient = redisConfig.getClient();
   }
 
   async logIn(
@@ -33,17 +32,22 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException();
     }
+
+    // Kiểm tra xem đã có refresh token trong Redis chưa
+    const existingToken = await this.redisClient.get(`refresh_token_${user.id}`);
+    if (existingToken) {
+      throw new ConflictException('User already logged in from another device/session');
+    }
     const payload = { id: user.id, email: user.email, role: user.role };
 
     const access_token = await this.tokenService.renderToken(payload, 20);
     const refresh_token = await this.tokenService.renderToken(payload, 100);
 
     // Lưu refresh_token lên Redis
-    // await this.redisClient.set(`refresh_token_${user.id}`, refresh_token, 'EX', 120);
+    await this.redisClient.set(`refresh_token_${user.id}`, refresh_token, 'EX', 120);
 
     const token = {
       userId : user.id,
-      access_token: access_token,
       refresh_token: refresh_token
     }
 
@@ -78,20 +82,23 @@ export class AuthService {
     // console.log('Existing refresh_token:', existingToken);
     
     // Xóa refresh_token khỏi Redis
-    // await this.redisClient.del(`refresh_token_${userId}`);
+    await this.redisClient.del(`refresh_token_${userId}`);
     
     // Xóa token khỏi db
     await this.tokenRepository.deleteByUserId(userId);
   }
 
   async refreshAccessToken(userId: number, refresh_token: string): Promise<{access_token: string }> {
-    const storedToken = await this.tokenRepository.findByUserId(userId);
+    // const storedToken = await this.tokenRepository.findByUserId(userId);
+    const storedToken = await this.redisClient.get(`refresh_token_${userId}`);
 
-    if (!storedToken || storedToken.dataValues.refreshToken != refresh_token) {
+    console.log(storedToken);
+
+    if (!storedToken || storedToken != refresh_token) {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const payload = { sub: userId, refresh_token: storedToken.refreshToken };
+    const payload = { sub: userId, refresh_token: storedToken };
     const newAccessToken = await this.tokenService.renderToken(payload, 10);
 
     return {
