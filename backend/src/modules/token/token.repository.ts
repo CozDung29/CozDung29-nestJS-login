@@ -14,7 +14,6 @@ export class TokenRepository {
         await Token.create({
             id: token.id,
             userId: token.userId,
-            accessToken: token.access_token,
             refreshToken: token.refresh_token
         })
     }
