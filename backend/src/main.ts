@@ -1,12 +1,15 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { setupSwagger } from './modules/config/config.swagger';
 
 const port = process.env.APP_PORT || 3000;
 const host = process.env.APP_HOST || 'localhost';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  setupSwagger(app);
 
   app.enableCors({
     origin: 'http://localhost:3001', 
