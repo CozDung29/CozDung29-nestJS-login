@@ -23,6 +23,14 @@ export class UserService {
     return this.userRepository.findByEmail(email);
   }
 
+  async getUserByToken(token: string): Promise<User | undefined> {
+    return this.userRepository.findByToken(token);
+  }
+
+  async verifyUser(email: string): Promise<User | null> {
+    return this.userRepository.updateIsVerified(email);
+  }
+
   async deleteUser(id: number): Promise<void> {
     return this.userRepository.delete(id);
   }

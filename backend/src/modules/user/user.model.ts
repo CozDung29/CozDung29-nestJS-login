@@ -26,4 +26,11 @@ export class User extends Model<User> {
     allowNull: false,
   })
   role: number;
+
+  @Column({
+    type: 'BOOLEAN',
+    defaultValue: false,
+    allowNull: false,
+  })
+  isVerified: boolean;
 }
