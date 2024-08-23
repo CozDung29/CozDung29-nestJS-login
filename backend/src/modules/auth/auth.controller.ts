@@ -1,10 +1,12 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
   HttpCode,
   HttpStatus,
   Post,
+  Query,
   Request,
   UnauthorizedException,
   UseGuards,
@@ -16,12 +18,14 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/auth.user.dto';
 import { LoginUserDto } from './dto/auth.login.dto';
 import { SmsService } from '../sms/sms.service';
+import { AppMailerService } from '../mailer/mailer.service';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
-    private smsService: SmsService
+    private smsService: SmsService,
+    private appMailerService: AppMailerService
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -33,8 +37,23 @@ export class AuthController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
-  register(@Body() createUserDto: CreateUserDto) {
-    return this.authService.register(createUserDto);
+  async register(@Body() createUserDto: CreateUserDto) {
+    const user = await this.authService.register(createUserDto);
+    return { 
+      message: 'User registered successfully. Confirmation email sent.',
+      email: createUserDto.email 
+    };
+  }
+
+  @Get('confirm')
+  async verifyEmail(@Query('token') token: string) {
+    if (!token) {
+      throw new BadRequestException('Token is required');
+    }
+
+    await this.authService.verifyEmail(token);
+
+    return { message: 'Email verified successfully' };
   }
 
   @UseGuards(AuthGuard)
@@ -70,4 +89,6 @@ export class AuthController {
     await this.smsService.sendOtp(phoneNumber, '123456'); // Thay '123456' bằng OTP thực tế
     return { message: 'OTP sent successfully' };
   }
+
+  
 }
