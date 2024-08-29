@@ -6,7 +6,7 @@
         constructor(private readonly mailerService: MailerService) {}
 
         async sendUserConfirmation(user: { email: string, token: string }): Promise<void> {
-            const url = `http://localhost:3000/auth/confirm?token=${user.token}`;// Đây là URL để xác nhận email
+            const url = `http://localhost:3000/auth/confirm?token=${user.token}`;// URL để xác nhận email
 
             await this.mailerService.sendMail({
                 to: user.email,

@@ -12,7 +12,7 @@ async function bootstrap() {
   setupSwagger(app);
 
   app.enableCors({
-    origin: 'http://localhost:3001', 
+    origin: 'http://localhost:4200', 
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });

@@ -1,0 +1,18 @@
+<form [formGroup]="profileForm" (ngSubmit)="handleSubmit()">
+  <div>
+    <label for="email">Email:</label>
+    <input id="email" formControlName="email" />
+  </div>
+  
+  <div>
+    <label for="password">Password:</label>
+    <input id="password" type="password" formControlName="password" />
+  </div>
+  
+  <div>
+    <label for="role">Role:</label>
+    <input id="role" type="number" formControlName="role" />
+  </div>
+  
+  <button type="submit" [disabled]="profileForm.invalid">Register</button>
+</form>
